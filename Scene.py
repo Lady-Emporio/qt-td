@@ -3,57 +3,57 @@ from PyQt5.QtWidgets import QGraphicsScene,QGraphicsEllipseItem,QGraphicsLineIte
 from PyQt5.QtCore import QTimer
 from PyQt5.QtGui import QColor,QBrush,QPen
 from Items import Unit
+from tower import Tower
 class Scene(QGraphicsScene):
+	MAXHP=20
+	HP=MAXHP
 	mobs=[]
+	towers=[]
+	createPos=[100,100]
 	def __init__(self):
 		QGraphicsScene.__init__(self)
-		WIDTH=600
+		
+		
+		WIDTH=480
 		HEIGHT=600
 		self.setSceneRect(0, 0, WIDTH, HEIGHT)
 		
+
+
+		
+		
+		
+
+		
+		self.addPointToPath(self.createPos[0],self.createPos[1])
+		self.addPointToPath(400,100)
+		self.addPointToPath(400,200)
+		self.addPointToPath(200,200)
+		self.addPointToPath(200,300)
+		self.addPointToPath(100,300)
+		
+
+		self.createUnit()
+
 		self.timer=QTimer()
 		self.timer.timeout.connect(self.timerWork)
 		self.timer.setInterval(16);
 		self.timer.start() 
 
-		
-		
-		
-
-		self.addPointToPath(100,300)
-		self.addPointToPath(300,200)
-		self.addPointToPath(150,50)
-		
-
-
-		u=Unit(30,30)
-		self.addItem(u)
-		self.mobs.append(u)
-
-
-		self.unit=QGraphicsEllipseItem(100, 100, 50, 50);
-		self.unit.setBrush(QColor(0,128,128))
-		self.addItem(self.unit);
-
 	def mousePressEvent(self,GraphicsSceneMouseEvent):
 		
 		PointF =GraphicsSceneMouseEvent.scenePos()
-		x=PointF.x()
-		y=PointF.y()
-		##print([self.unit.rect(),x,y])
-		self.unit.setPos(x-125,y-125)
-		self.unit.update()
-		#u=Unit(x,y)
-		#self.addItem(u)
-
-
-		#self.mobs[0].initGoTo(x,y)
-	#	qlist_Elements=self.collidingItems(u)
-	#	if (len(qlist_Elements)!=0):
-	#		self.removeItem(u)
-	#		QGraphicsScene.mousePressEvent(self,GraphicsSceneMouseEvent)
-
-
+		x=PointF.x()-Tower.WIDTH/2
+		y=PointF.y()-Tower.HEIGHT/2
+		self.createTower(x,y)
+		
+	def unitGoToLastPoint(self,unit):
+		if unit.hp>0:
+			self.HP-=unit.DAMAGE
+			self.removeItem(unit)
+			self.mobs.remove(unit)
+			view=self.views()[0]
+			view.hpChange.emit()
 	def addPointToPath(self,x,y):
 		widthEllipse=20;
 		heightEllipse=20;
@@ -71,13 +71,19 @@ class Scene(QGraphicsScene):
 		item.setBrush(QColor(0,0,128))
 		self.addItem(item);
 
-		
+	def createUnit(self):
+		u=Unit(self.createPos[0],self.createPos[1])
+		self.addItem(u)
+		self.mobs.append(u)
 
-
+	def createTower(self,x,y):
+		t=Tower(x,y)
+		self.addItem(t)
+		self.towers.append(t)
 	def timerWork(self):
+		for tower in self.towers:
+			tower.update(self.mobs)
 		for mob in self.mobs:
-			if mob.collidesWithItem(self.unit):
-				print("collaps")
-				return
 			mob.move()
+		
 			

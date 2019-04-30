@@ -1,13 +1,18 @@
-from PyQt5.QtWidgets import QGraphicsRectItem 
+from PyQt5.QtWidgets import QGraphicsRectItem
 from PyQt5.QtGui import QColor ,QFontMetrics ,QVector2D
-from PyQt5.QtCore import Qt,QRectF
+from PyQt5.QtCore import Qt,QRectF,pyqtSignal
 class Unit(QGraphicsRectItem):
 	WIDTH=30
 	HEIGHT=30
 	PATH=[]
-	SPEED=0.3;
+	SPEED=1;
+	DAMAGE=1;
 	def __init__(self,x,y):
+	
+		self.isAlive=True
 		QGraphicsRectItem.__init__(self,0,0,self.WIDTH,self.HEIGHT)
+
+		
 		self.hp=100
 		
 		self.setPos(x-self.WIDTH/2,y-self.HEIGHT/2)
@@ -32,12 +37,7 @@ class Unit(QGraphicsRectItem):
 		
 		rect=QRectF(0,0,self.WIDTH,self.HEIGHT)
 		painter.drawText(rect, Qt.AlignHCenter|Qt.AlignTop, str(self.hp))
-		
-	#def mousePressEvent(self,QGraphicsSceneMouseEvent):
-	#	self.hp-=20
-	#	if(self.hp<=0):
-	#		self.scene().removeItem(self)
-	#	self.update()
+
 	def initGoTo(self,x,y):
 
 		nowPosition=QVector2D(self.x(),self.y())
@@ -58,13 +58,17 @@ class Unit(QGraphicsRectItem):
 		self.moveY=needGoToY/iterTimeToGoToGoal
 
 	def move(self):
+		if not self.isAlive:
+			return;
 		if self.x()==self.needGoTo.x() and self.y()==self.needGoTo.y():
 			self.point+=1
 			if self.point<=len(self.PATH)-1:
 				needGoTo=self.PATH[self.point]
 				self.initGoTo(needGoTo[0],needGoTo[1])
+			else:
+				self.isAlive=False
+				self.scene().unitGoToLastPoint(self)
 				
-
 		if self.moveX==0 and self.moveY==0:
 			return 
 		if self.moveX>0:
@@ -90,6 +94,6 @@ class Unit(QGraphicsRectItem):
 		self.actuallyY+=self.moveY
 		self.setPos(self.actuallyX,self.actuallyY)
 		self.update()
-		#print([self.actuallyX,self.actuallyY,self.moveX,self.moveY])
+		
 		
 	
