@@ -45,6 +45,7 @@ class CentalWidget(QWidget):
 		self.changeHP()
 		
 	def createUnit(self):
+		
 		self.sceneView.scene().createUnit()
 	def changeHP(self):
 		text="HP:"+str(self.sceneView.scene().HP)

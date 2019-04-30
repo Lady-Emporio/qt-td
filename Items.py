@@ -8,11 +8,9 @@ class Unit(QGraphicsRectItem):
 	SPEED=1;
 	DAMAGE=1;
 	def __init__(self,x,y):
-	
-		self.isAlive=True
 		QGraphicsRectItem.__init__(self,0,0,self.WIDTH,self.HEIGHT)
 
-		
+		self.isAlive=True
 		self.hp=100
 		
 		self.setPos(x-self.WIDTH/2,y-self.HEIGHT/2)
@@ -60,6 +58,9 @@ class Unit(QGraphicsRectItem):
 	def move(self):
 		if not self.isAlive:
 			return;
+		if self.hp<=0:
+			self.scene().mobs.remove(self)
+			self.scene().removeItem(self)
 		if self.x()==self.needGoTo.x() and self.y()==self.needGoTo.y():
 			self.point+=1
 			if self.point<=len(self.PATH)-1:
